@@ -11,7 +11,7 @@
 
 \title{COMPSCI 170 Fall 2024 --- Homework \Homework Solutions}
 \author{\Name, SID \SID}
-\markboth{CS70--\Session\  Homework \Homework\ \Name}{CS70--\Session\ Homework \Homework\ \Name}
+\markboth{CS70--\Session\  Homework \Homework\ \Name}{CS170 -- \Session\ Homework \Homework\ \Name}
 \pagestyle{myheadings}
 \date{\today}
 
@@ -29,59 +29,205 @@
 \begin{document}
 \maketitle
 
-Collaborators: NONE
+\section*{1. Study Groups}
 
-\section*{1. Course Syllabus}
-\begin{qparts}
-\item
-YOUR ANSWER GOES HERE
-
-\item
-YOUR ANSWER GOES HERE
-
-\end{qparts}
+none
 
 
 
 \newpage
-\section*{2.}
+\section*{2. Course Policies}
 \begin{qparts}
 \item
-YOUR ANSWER GOES HERE
+No alternate exams are planned. \newline
+Midterm 1: Wednesday, 10/2/2024, 7:00 PM - 9:00 PM \newline
+Midterm 2: Tuesday, 11/5/2024, 7:00 PM - 9:00 PM \newline
+Final: Tuesday, 12/17/2024, 8:00 AM - 11:00 AM
 
 \item
-YOUR ANSWER GOES HERE
+Friday, 10:00 PM. The other 2 hours are mainly to cater to submission issues.
 
 \item
-YOUR ANSWER GOES HERE
+Use the hw drops.
 
 \item
-YOUR ANSWER GOES HERE
+Ed.
 
 \item
-YOUR ANSWER GOES HERE
+“I have read and understood the course syllabus and policies.” - Kartikeya Sharma
 
 \end{qparts}
 
 
 \newpage
-\section*{3.}
-YOUR ANSWER GOES HERE
+\section*{3. Understanding Academic Integrity}
+\begin{qparts}
+\item
+Not OK.
+
+\item
+Not OK.
+
+\item
+Not OK.
+
+\item
+OK.
+
+\end{qparts}
 
 
 \newpage
-\section*{4.}
-YOUR ANSWER GOES HERE
+\section*{4. Log Identities}
+\begin{align*}
+\text{(a)} & \quad \frac{\ln(x)}{\ln(y)} = \log_y(x) \\
+\text{(b)} & \quad \ln(x) + \ln(y) = \ln(xy) \\
+\text{(c)} & \quad \ln(x) - \ln(y) = \ln\left(\frac{x}{y}\right) \\
+\text{(d)} & \quad 170 \cdot \ln(x) = \ln(x^{170})
+\end{align*}
+
+\newpage
+\section*{5. Asymptotics Practice}
+
+\begin{enumerate}
+
+\item 
+\( f(n) = n^2 + 5n \), \( g(n) = 1000(n+1)^2 \)
+   \rightarrow \( f = O(g) \) \textbf{ and } \( g = O(f) \)
+
+\item 
+\( f(n) = 5n^3 \), \( g(n) = n^3 + (\log n)^{10} \)
+   \rightarrow \( f = O(g) \) \textbf{ and } \( g = O(f) \)
+
+\item 
+\( f(n) = n^{100} \), \( g(n) = (1.01)^n \)
+   \rightarrow \( f = O(g) \)
+
+\item 
+\( f(n) = (\log n)^{10} \), \( g(n) = n^{0.1} \)
+   \rightarrow \( f = O(g) \)
+
+\item 
+\( f(n) = n \cdot 2^n \), \( g(n) = 3^n \)
+   \rightarrow \( f = O(g) \)
+
+\item 
+\( f(n) = n! \), \( g(n) = n^n \)
+   \rightarrow \( f = O(g) \)
+
+\item 
+\( f(n) = 1 + b + b^2 + \dots + b^n \), \( g(n) = b^n \) for arbitrary constant \( b > 0 \)
+\begin{qparts}
+\item If \( b > 1 \), \( f = O(g) \) \textbf{and} \( g = O(f) \).
+\item If \( b = 1 \), \( g = O(f) \).
+\item If \( 0 < b < 1 \), \( g = O(f) \).
+\end{qparts}
+
+\end{enumerate}
+
 
 
 \newpage
-\section*{5.}
-YOUR ANSWER GOES HERE
+\section*{6. Recurrence Relations Solutions}
 
+\begin{qparts}
+        
+\item 
+\( T(n) = 2T(n/3) + 5n \)
 
-\newpage
-\section*{6.}
-YOUR ANSWER GOES HERE
+Using the expansion method.
 
+Expanding the recurrence:
+
+\[
+T(n) = 2T\left(\frac{n}{3}\right) + 5n
+\]
+
+Substitute \( T\left(\frac{n}{3}\right) \) using the same recurrence:
+
+\[
+T\left(\frac{n}{3}\right) = 2T\left(\frac{n}{9}\right) + 5\left(\frac{n}{3}\right)
+\]
+
+Substituting back:
+
+\[
+T(n) = 2\left[2T\left(\frac{n}{9}\right) + 5\left(\frac{n}{3}\right)\right] + 5n = 4T\left(\frac{n}{9}\right) + \frac{10n}{3} + 5n
+\]
+
+Continue expanding:
+
+\[
+T(n) = 4\left[2T\left(\frac{n}{27}\right) + 5\left(\frac{n}{9}\right)\right] + \frac{10n}{3} + 5n = 8T\left(\frac{n}{27}\right) + \frac{20n}{9} + \frac{10n}{3} + 5n
+\]
+
+Generalizing this:
+
+\[
+T(n) = 2^k T\left(\frac{n}{3^k}\right) + n\sum_{i=0}^{k-1} \frac{5 \cdot 2^i}{3^i}
+\]
+
+For large \( k \), \( \frac{n}{3^k} \) approaches 1, so \( T(1) \) is a constant. The geometric series sum:
+
+\[
+\sum_{i=0}^{k-1} \frac{2^i}{3^i} = \sum_{i=0}^{k-1} \left(\frac{2}{3}\right)^i
+\]
+
+This is a convergent geometric series with sum:
+
+\[
+\sum_{i=0}^{\infty} \left(\frac{2}{3}\right)^i = \frac{1}{1-\frac{2}{3}} = 3
+\]
+
+Thus:
+
+\[
+T(n) = n \cdot 3 + O(n)
+\]
+
+So, the solution is \( T(n) = \Theta(n) \).
+
+\item 
+ An algorithm \( A \) takes \( \Theta(n^2) \) time to partition the input into 5 subproblems of size \( n/5 \), and then recursively runs itself on 3 of those subproblems.
+
+The recurrence relation for this scenario is:
+
+\[
+T(n) = 3T\left(\frac{n}{5}\right) + \Theta(n^2)
+\]
+
+Using the expansion method:
+
+\[
+T(n) = 3\left[3T\left(\frac{n}{25}\right) + \left(\frac{n}{5}\right)^2\right] + n^2 = 3^2T\left(\frac{n}{25}\right) + 3n^2\left(\frac{1}{25}\right) + n^2
+\]
+
+Continuing the expansion:
+
+\[
+T(n) = 3^k T\left(\frac{n}{5^k}\right) + n^2 \sum_{i=0}^{k-1} \frac{3^i}{5^{2i}}
+\]
+
+As \( k \) increases, \( \frac{n}{5^k} \) approaches 1, so \( T(1) \) is a constant. The series sum is:
+
+\[
+\sum_{i=0}^{\infty} \left(\frac{3}{25}\right)^i
+\]
+
+This is also a geometric series with sum:
+
+\[
+\sum_{i=0}^{\infty} \left(\frac{3}{25}\right)^i = \frac{1}{1-\frac{3}{25}} = \frac{25}{22}
+\]
+
+Thus:
+
+\[
+T(n) = n^2 \cdot \frac{25}{22} + O(n^2)
+\]
+
+So, the solution is \( T(n) = \Theta(n^2) \).
+
+\end{qparts}
 
 \end{document}
