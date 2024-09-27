@@ -1,0 +1,323 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,enumerate}
+
+\def\Name{Kartikeya Sharma}  % Your name
+\def\SID{3037376860}  % Your student ID number
+\def\Homework{4 } % Number of Homework
+\def\Session{Fall 2024}
+
+
+\title{COMPSCI 170 Fall 2024 --- Homework \Homework Solutions}
+\author{\Name, SID \SID}
+\markboth{CS70--\Session\  Homework \Homework\ \Name}{CS170 -- \Session\ Homework \Homework\ \Name}
+\pagestyle{myheadings}
+\date{\today}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\textheight=9in
+\textwidth=6.5in
+\topmargin=-.75in
+\oddsidemargin=0.25in
+\evensidemargin=0.25in
+
+
+\begin{document}
+\maketitle
+
+\section*{1. Study Groups}
+
+none
+
+\newpage
+
+\section*{2. Sparsity and SCCs}
+
+\subsection*{Part (a)}
+
+\begin{enumerate}
+    \item A weakly-connected graph becomes connected when its edges are made bidirectional.
+    \item The graph has \( n \) vertices and \( n-1 \) edges, which forms a tree structure when viewed as an undirected graph.
+    \item In a directed version, this weak connectivity implies that no vertex can reach every other vertex, so there are no strongly connected components involving multiple vertices.
+    \item Each vertex in such a graph forms its own strongly connected component because there are not enough edges to allow any two vertices to mutually reach each other.
+\end{enumerate}
+
+Thus, a weakly-connected graph with \( n \) vertices and \( n-1 \) edges must have exactly \( n \) strongly connected components.
+
+\subsection*{Part (b)}
+
+\begin{enumerate}
+    \item The graph has \( n \) vertices and \( n \) directed edges, with each vertex having two incident edges.
+    \item Strongly connected components (SCCs) are determined by whether or not cycles are formed.
+\end{enumerate}
+
+\textbf{Conditions for \( k \) SCCs}:
+\begin{enumerate}
+    \item If \( k = 1 \), the graph must consist of a single cycle where all vertices are part of the same SCC.
+    \item If \( k = n \), each vertex must form its own SCC, meaning there are no cycles, and each vertex points directly to another without forming a loop.
+    \item For intermediate values of \( k \), there could be \( k \) disjoint cycles or chains of vertices. For instance, when \( n = 5 \) and \( k = 2 \), the graph may consist of one cycle with 3 vertices and another cycle with 2 vertices.
+\end{enumerate}
+
+In general, the number of SCCs \( k \) depends on how the directed edges arrange into cycles or chains.
+
+\subsection*{Part (c)}
+
+We can use a simple DFS or BFS to count the number of SCCs:
+
+\begin{enumerate}
+    \item \textbf{Start DFS/BFS}: Begin from any unvisited vertex \( v \).
+    \item \textbf{Mark vertices as visited}: As you explore the graph from \( v \), mark all reachable vertices.
+    \item \textbf{Detect cycles}: If during traversal you return to the starting vertex \( v \), you have found a cycle, which forms an SCC.
+    \item \textbf{Count the SCC}: Once the traversal for a vertex is completed, increment the SCC count by one.
+    \item \textbf{Repeat for unvisited vertices}: Repeat the process for all remaining unvisited vertices.
+\end{enumerate}
+
+This algorithm is efficient and operates in \( O(n) \), visiting each vertex and edge exactly once.
+
+\subsection*{Part (d)}
+
+The modified graph \( G' \) has the same number of vertices and edges but may have a different structure.
+
+\begin{enumerate}
+    \item \textbf{DFS/BFS Traversal}: Begin the DFS or BFS from any unvisited vertex as before.
+    \item \textbf{Cycle Detection}: As you traverse, check if you revisit any vertex, which would indicate a cycle.
+    \item \textbf{Handle Other Configurations}: If the graph is not composed entirely of cycles (e.g., if it has DAG-like structures), terminate the traversal once you revisit any vertex or finish exploring all reachable vertices.
+    \item \textbf{Count SCCs}: Each distinct group of vertices reachable in both directions counts as one SCC.
+\end{enumerate}
+
+This algorithm still runs in \( O(n) \), visiting each vertex and edge once, and it efficiently counts the SCCs in the modified graph structure.
+
+
+
+\newpage
+\section*{3. 2-SAT}
+
+ Given an instance \( I \) of 2SAT with \( n \) variables and \( m \) clauses, I'm constructing a directed graph \( G_I = (V, E) \) as follows:
+
+\begin{itemize}
+    \item \( G_I \) has \( 2n \) nodes: one for each variable and its negation.
+    \item \( G_I \) has \( 2m \) edges: for each clause \( (\alpha \vee \beta) \), there are two directed edges, one from \( \neg \alpha \) to \( \beta \), and one from \( \neg \beta \) to \( \alpha \).
+\end{itemize}
+
+Note that each clause \( (\alpha \vee \beta) \) is equivalent to the implications \( \neg \alpha \Rightarrow \beta \) and \( \neg \beta \Rightarrow \alpha \). This graph construction captures these implications.
+
+\subsection*{Part (a)}
+Show that if \( G_I \) has a strongly connected component containing both \( x \) and \( \neg x \) for some variable \( x \), then \( I \) has no satisfying assignment.
+
+
+\begin{enumerate}
+    \item Suppose there exists a strongly connected component (SCC) in \( G_I \) that contains both a variable \( x \) and its negation \( \neg x \).
+    \item Since \( x \) and \( \neg x \) are in the same SCC, by the definition of strongly connected components, there is a path from \( x \) to \( \neg x \) and a path from \( \neg x \) to \( x \).
+    \item These paths imply that both \( x \Rightarrow \neg x \) and \( \neg x \Rightarrow x \), which means \( x \) must be both true and false simultaneously, which is a contradiction.
+    \item Hence, if such an SCC exists, there is no way to assign a value to \( x \) that satisfies all clauses, and thus the instance \( I \) has no satisfying assignment.
+\end{enumerate}
+
+\subsection*{Part (b)}
+Now show the converse of (a): namely, if none of \( G_I \)'s strongly connected components contain both a literal and its negation, then the instance \( I \) must be satisfiable.
+
+
+\begin{enumerate}
+    \item Suppose no SCC in \( G_I \) contains both a literal \( x \) and its negation \( \neg x \).
+    \item We can assign values to the variables in the following way: 
+    \begin{itemize}
+        \item Perform a topological sorting of the SCCs in \( G_I \).
+        \item Process the SCCs in reverse topological order. For each SCC, if any literal in the SCC has not yet been assigned a value, assign it the value "true". Assign the negation of that literal "false".
+    \end{itemize}
+    \item This process ensures that no contradictions arise because, in reverse topological order, no SCC containing \( \neg x \) will force \( x \) to be true if \( \neg x \) is already false.
+    \item Therefore, this method guarantees a valid assignment of true/false values to all variables, and hence the instance \( I \) is satisfiable.
+\end{enumerate}
+
+\subsection*{Part (c)}
+Conclude that there is a linear-time algorithm for solving 2SAT. Provide the algorithm description and runtime analysis.
+
+
+\begin{enumerate}
+    \item Construct the implication graph \( G_I \) from the given 2SAT instance. This takes \( O(n + m) \) time because the graph has \( 2n \) vertices and \( 2m \) edges.
+    \item Find the strongly connected components (SCCs) of \( G_I \). This can be done using Kosaraju's or Tarjan's algorithm, both of which run in \( O(n + m) \) time.
+    \item Check if any SCC contains both a literal and its negation. If such an SCC exists, the instance is unsatisfiable. If not, assign truth values to the literals using the method described in part (b), which also runs in \( O(n + m) \) time.
+\end{enumerate}
+
+Thus, the overall time complexity of the algorithm is \( O(n + m) \), making it a linear-time algorithm for solving 2SAT.
+
+
+\newpage
+
+\section*{4. Road Trip}
+
+Minimizing both gas costs and rental fees. The road trip can be modeled as a graph \( G = (V, E, c) \), where:
+
+\begin{itemize}
+    \item \( V \) is the set of cities (nodes),
+    \item \( E \) is the set of roads (edges),
+    \item \( c(u, v) \) is the cost of driving from city \( u \) to city \( v \), which includes gas for driving along edge \( (u, v) \), and
+    \item \( r \) is the rental fee paid per day, regardless of driving.
+\end{itemize}
+
+
+\subsection*{Algorithm Description}
+We will solve this problem by adapting a shortest-path algorithm like Dijkstra's algorithm. We treat each car as a separate entity traveling the graph while accounting for rental costs per day.
+
+\begin{enumerate}
+    \item Construct a graph \( G \) representing the road network with each edge \( (u, v) \) having a weight \( c(u, v) \), the gas cost of traveling between the two cities.
+    \item Modify the graph \( G \) so that each edge's cost also includes a rental fee for the day, adding \( r \) to each city's overnight stop cost.
+    \item Run Dijkstra’s algorithm twice, once for each car, from the start city (Berkeley) to the destination city (Chicago). The idea is to compute the minimum cost for both cars under the assumption that no two cars can rest in the same city on the same night.
+    \item Use dynamic programming to calculate the optimal travel route, ensuring that both cars rest in different cities overnight and arrive in Chicago before the conference.
+\end{enumerate}
+
+\subsection*{Proof of Correctness}
+We use Dijkstra's algorithm, which is proven to compute the shortest path in a weighted graph with non-negative edges. Since our problem involves minimizing costs (which include gas and rental), the algorithm will:
+
+\begin{enumerate}
+    \item Ensure that the gas costs are minimized by following the shortest paths between cities,
+    \item Ensure that rental costs are minimized by calculating optimal rest stops where one group stays in a city while the other group moves ahead, avoiding overlap in rest stops.
+\end{enumerate}
+
+Thus, the solution produced by the algorithm will be correct and optimal under the constraints provided (i.e., two cars starting from Berkeley, stopping in different cities, and arriving in Chicago).
+
+\subsection*{Runtime Analysis}
+The algorithm uses Dijkstra's algorithm, which runs in \( O(m \log n) \), where \( n = |V| \) and \( m = |E| \).
+
+\begin{enumerate}
+    \item Constructing the graph \( G \) with edge costs adjusted for rental fees takes \( O(m) \) time.
+    \item Running Dijkstra’s algorithm twice (once for each car) takes \( O(m \log n) \) for each run, resulting in a total time complexity of \( O(m \log n) \).
+    \item Additional dynamic programming to ensure that rest stops do not overlap adds at most \( O(n) \), which does not change the overall complexity.
+\end{enumerate}
+
+Thus, the total runtime of the algorithm is \( O(m \log n) \).
+
+
+
+\newpage
+
+\section*{5. Shortest Path with Clusters}
+
+We are given a graph \( G = (V, E, w) \), where \( V \) is the set of vertices, \( E \) is the set of edges, and \( w \) denotes possibly negative edge weights. Additionally, each strongly connected component (SCC) of \( G \) has at most \( k \) vertices. Task is to design an algorithm that finds the shortest path from a source vertex \( s \) to a target vertex \( t \) in \( G \), with the following constraints:
+- The algorithm must run faster than \( O(|V| \cdot |E|) \) when \( k \) is much smaller than \( |V| \).
+- The algorithm should not be slower than \( O(|V| \cdot |E|) \) when \( k = \Theta(|V|) \).
+
+\subsection*{Algorithm Description}
+
+The algorithm leverages the structure of the graph, particularly the strongly connected components (SCCs), to optimize the shortest path computation. Here's how the algorithm proceeds:
+
+\begin{enumerate}
+    \item \textbf{Step 1: Compute SCCs.} First, use Tarjan's or Kosaraju's algorithm to identify all the strongly connected components (SCCs) of the graph. This step takes \( O(|V| + |E|) \) time.
+    
+    \item \textbf{Step 2: Collapse SCCs.} Treat each SCC as a supernode in a new condensed graph \( G' \). In this condensed graph, there are no cycles, as each SCC forms a single node, and the graph becomes a directed acyclic graph (DAG). This condensation process can also be done in \( O(|V| + |E|) \).
+    
+    \item \textbf{Step 3: Shortest Path on the DAG.} Apply a shortest path algorithm to the condensed graph \( G' \). Since \( G' \) is a DAG, the shortest path from \( s \) to \( t \) can be computed using topological sorting followed by dynamic programming, which runs in \( O(|V'| + |E'|) \), where \( |V'| \leq |V| \) and \( |E'| \leq |E| \).
+    
+    \item \textbf{Step 4: Handle SCC internals.} Once the shortest path between supernodes is known, process the internal structure of the SCCs. Since each SCC contains at most \( k \) vertices, run Bellman-Ford or Dijkstra’s algorithm inside each SCC to find the shortest path between nodes within the SCC. This step has a worst-case time complexity of \( O(k \cdot |E_{\text{SCC}}|) \), where \( |E_{\text{SCC}}| \) is the number of edges within the SCC.
+\end{enumerate}
+
+\subsection*{Proof of Correctness}
+
+\begin{enumerate}
+    \item \textbf{SCC Decomposition:} The decomposition of the graph into SCCs ensures that cycles are removed, allowing us to treat the graph as a DAG. This guarantees that we can apply shortest path algorithms efficiently in the condensed graph.
+    
+    \item \textbf{Topological Sorting:} Since the condensed graph \( G' \) is a DAG, topological sorting guarantees that for each node, the shortest path is computed based on its predecessors, ensuring the correct shortest path is found.
+    
+    \item \textbf{Shortest Paths within SCCs:} Inside each SCC, we run a standard shortest path algorithm (like Bellman-Ford) to ensure that all paths within the SCC are valid, even with negative edges. Since SCCs are processed individually, this step does not affect the paths between SCCs.
+    
+    \item \textbf{End-to-End Path:} By combining the paths between SCCs with the shortest paths inside SCCs, we can guarantee that the final shortest path from \( s \) to \( t \) is correctly computed.
+\end{enumerate}
+
+\subsection*{Runtime Analysis}
+
+The overall time complexity of the algorithm is:
+
+\begin{enumerate}
+    \item \textbf{SCC Decomposition:} Tarjan’s or Kosaraju’s algorithm runs in \( O(|V| + |E|) \), which is optimal for this step.
+    
+    \item \textbf{Condensing the Graph:} Collapsing SCCs into supernodes takes \( O(|V| + |E|) \) as well.
+    
+    \item \textbf{Shortest Path on the DAG:} Finding the shortest path on the DAG using topological sorting and dynamic programming takes \( O(|V'| + |E'|) \), where \( |V'| \) is the number of SCCs. In the worst case, \( |V'| = O(|V|) \) and \( |E'| = O(|E|) \), so this step takes \( O(|V| + |E|) \).
+    
+    \item \textbf{Processing SCC Internals:} Within each SCC, Bellman-Ford or Dijkstra’s algorithm runs in \( O(k^2) \) or better. Since each SCC has at most \( k \) vertices, the overall complexity for processing all SCCs is \( O(k \cdot |V| + |E_{\text{SCC}}|) \), which is efficient when \( k \) is much smaller than \( |V| \).
+    
+    \item \textbf{Overall Complexity:} The total time complexity of the algorithm is \( O(|V| + |E| + k^2) \). When \( k \) is small (i.e., \( k \ll |V| \)), the algorithm runs faster than \( O(|V| \cdot |E|) \), and in the worst case when \( k = \Theta(|V|) \), the algorithm matches the complexity of \( O(|V| \cdot |E|) \).
+\end{enumerate}
+
+\newpage
+
+\section*{6. Arbitrage}
+
+We are tasked with designing an efficient algorithm to find the most profitable sequence of currency exchanges between two specific currencies \( a \) and \( b \), assuming the set of exchange rates is arbitrage-free. The problem asks for an efficient algorithm that maximizes the amount of currency \( b \) starting with a fixed amount of currency \( a \).
+
+\subsection*{Part (a)}
+
+\subsection*{Algorithm Description}
+
+We can represent the problem as a graph where the vertices are the currencies, and the edges represent the exchange rates. To find the most profitable sequence of exchanges, we can modify the Bellman-Ford algorithm to maximize the amount of currency rather than minimize the cost, as typically done in shortest-path problems.
+
+The algorithm proceeds as follows:
+
+\begin{enumerate}
+    \item Graph Construction:
+    \begin{itemize}
+        \item Create a graph where each currency \( c_i \) is represented as a vertex.
+        \item For each pair of currencies \( c_i \) and \( c_j \) with an exchange rate \( r_{ij} \), add a directed edge from \( c_i \) to \( c_j \) with a weight \( \log(r_{ij}) \). The goal here is to convert the product of rates into a sum, allowing us to maximize profit by finding the longest path in terms of these log-transformed values.
+    \end{itemize}
+    
+    \item Modified Bellman-Ford Algorithm:
+    \begin{itemize}
+        \item Initialize \( \log(\text{currency amount at } a) = 0 \) and set all other values to \( -\infty \).
+        \item Run the Bellman-Ford algorithm to relax all edges for \( n-1 \) iterations (where \( n \) is the number of currencies). For each edge from \( c_i \) to \( c_j \), update the maximum log value if a better exchange rate is found.
+    \end{itemize}
+    
+    \item Path Construction:
+    \begin{itemize}
+        \item After \( n-1 \) relaxations, reconstruct the path from currency \( a \) to currency \( b \) by backtracking through the graph to determine the sequence of exchanges that maximizes the amount of currency \( b \).
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Proof of Correctness}
+
+The algorithm is correct because:
+
+\begin{enumerate}
+    \item The Bellman-Ford algorithm is guaranteed to find the longest path (in terms of the sum of log exchange rates) in a graph where no negative-weight cycle exists (i.e., an arbitrage-free graph).
+    \item By transforming the exchange rates using logarithms, we convert the product of exchange rates into a summation problem, allowing us to use a pathfinding algorithm to maximize the product of exchange rates.
+    \item Relaxing the edges for \( n-1 \) iterations ensures that the longest path is found, and since the graph is arbitrage-free, we know there are no cycles that could infinitely increase profit.
+\end{enumerate}
+
+Thus, the Bellman-Ford algorithm, with modified weights, correctly computes the most profitable sequence of exchanges from \( a \) to \( b \).
+
+\subsection*{Runtime Analysis}
+
+\begin{enumerate}
+    \item Constructing the graph takes \( O(n^2) \), as we need to add edges for each pair of currencies.
+    \item Running the Bellman-Ford algorithm takes \( O(n^2) \), where \( n \) is the number of currencies, because we need to relax all edges \( n-1 \) times.
+    \item Path reconstruction adds another \( O(n) \) step for backtracking the sequence of exchanges.
+\end{enumerate}
+
+Therefore, the overall time complexity of the algorithm is \( O(n^2) \).
+
+\subsection*{Part (b)}
+
+\subsection*{Algorithm to Detect Arbitrage}
+
+Oski asks for an efficient algorithm to detect the possibility of arbitrage. We can solve this using a modified version of the Bellman-Ford algorithm. The steps are as follows:
+
+\begin{enumerate}
+    \item Graph Construction with Log Transformation:
+    \begin{itemize}
+        \item As in part (a), create a graph where vertices represent currencies and edges represent exchange rates, with edge weights transformed as \( w_{ij} = -\log(r_{ij}) \).
+    \end{itemize}
+    
+    \item Detect Negative Cycles:
+    \begin{itemize}
+        \item Run the Bellman-Ford algorithm from an arbitrary start vertex. If after \( n-1 \) relaxations, any edge can still be relaxed, a negative cycle exists, indicating an arbitrage opportunity.
+    \end{itemize}
+\end{enumerate}
+
+If a negative cycle is detected, it implies that starting with one unit of currency, a profit can be made by repeatedly exchanging currencies along the cycle. Thus, arbitrage is possible.
+
+\subsection*{Runtime Analysis}
+
+The time complexity for detecting arbitrage using Bellman-Ford is \( O(n^2) \), as we need to relax all edges \( n-1 \) times and check for further relaxations. This matches the complexity of the standard Bellman-Ford algorithm.
+
+
+
+\end{document}

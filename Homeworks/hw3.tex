@@ -1,0 +1,260 @@
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,enumerate}
+
+\def\Name{Kartikeya Sharma}  % Your name
+\def\SID{3037376860}  % Your student ID number
+\def\Homework{3 } % Number of Homework
+\def\Session{Fall 2024}
+
+
+\title{COMPSCI 170 Fall 2024 --- Homework \Homework Solutions}
+\author{\Name, SID \SID}
+\markboth{CS70--\Session\  Homework \Homework\ \Name}{CS170 -- \Session\ Homework \Homework\ \Name}
+\pagestyle{myheadings}
+\date{\today}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\textheight=9in
+\textwidth=6.5in
+\topmargin=-.75in
+\oddsidemargin=0.25in
+\evensidemargin=0.25in
+
+
+\begin{document}
+\maketitle
+
+\section*{1. Study Groups}
+
+none
+
+\newpage
+\section*{2. Hadamard matrices}
+\subsection*{Part (a)}
+Given the Hadamard matrix \( H_k \), it is recursively defined as:
+
+\[
+H_k = \begin{bmatrix} 
+H_{k-1} & H_{k-1} \\
+H_{k-1} & -H_{k-1}
+\end{bmatrix}
+\]
+
+Let the vector \( v \) be defined as:
+
+\[
+v = \begin{bmatrix} v_1 \\ v_2 \end{bmatrix}
+\]
+
+where \( v_1 \) and \( v_2 \) are the top and bottom halves of \( v \), each of length \( 2^{k-1} \).
+
+The matrix-vector product \( H_k v \) can be written as:
+
+\[
+H_k v = \begin{bmatrix} H_{k-1} & H_{k-1} \\ H_{k-1} & -H_{k-1} \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix}
+\]
+
+which simplifies to:
+
+\[
+H_k v = \begin{bmatrix} H_{k-1} v_1 + H_{k-1} v_2 \\ H_{k-1} v_1 - H_{k-1} v_2 \end{bmatrix}
+\]
+
+Thus, the product \( H_k v \) can be computed using two smaller matrix-vector products with \( H_{k-1} \) and vectors \( v_1 \) and \( v_2 \).
+
+\subsection*{Part (b)}
+To compute the matrix-vector product \( H_k v \) efficiently, we can use a divide-and-conquer approach based on the recursive structure of \( H_k \). The steps are as follows:
+
+\begin{enumerate}
+    \item Divide the vector \( v \) into two halves: \( v_1 \) and \( v_2 \).
+    \item Recursively compute the matrix-vector products \( H_{k-1} v_1 \) and \( H_{k-1} v_2 \).
+    \item Combine the results using the following equations:
+    \[
+    \text{Top half of } H_k v = H_{k-1} v_1 + H_{k-1} v_2
+    \]
+    \[
+    \text{Bottom half of } H_k v = H_{k-1} v_1 - H_{k-1} v_2
+    \]
+\end{enumerate}
+
+Each recursive step reduces the problem size by half. The recurrence relation for the time complexity is:
+
+\[
+T(n) = 2T(n/2) + O(n)
+\]
+
+Using the master theorem, the solution to this recurrence is:
+
+\[
+T(n) = O(n \log n)
+\]
+
+Therefore, the matrix-vector product \( H_k v \) can be computed in \( O(n \log n) \) time.
+
+
+
+\newpage
+\section*{3. Distant Descendants}
+
+\section*{Solution}
+
+\subsection*{Part 1: Recursive Equation for \( d[v] \) (Hint 1)}
+Let \( v \) be a vertex, and let \( C(v) \) be the set of children of \( v \). The value \( d[v] \) represents the number of descendants of \( v \) that are at least \( K \) distance away from \( v \).
+
+The recursive equation to compute \( d[v] \) is given by:
+
+\[
+d[v] = \sum_{u \in C(v)} d[u] + \left( \text{number of descendants at exactly distance } K \text{ from } v \right)
+\]
+
+Thus, \( d[v] \) is the sum of the \( d \)-values of its children, plus an additional value that accounts for descendants exactly \( K \) distance away from \( v \).
+
+\subsection*{Part 2: Graph Traversal (Hint 2)}
+To implement the recursive computation for \( d[v] \), we can use a Depth-First Search (DFS) traversal of the tree starting from the root \( r \).
+
+\begin{enumerate}
+    \item Initialize \( d[v] = 0 \) for all vertices \( v \).
+    \item Perform a DFS traversal from the root \( r \), processing each vertex \( v \) after all of its children have been processed (post-order traversal).
+    \item During the DFS traversal, for each vertex \( v \), update \( d[v] \) by summing the values of \( d[u] \) for each child \( u \in C(v) \) and adding the descendants that are exactly \( K \) distance away.
+\end{enumerate}
+
+\subsection*{Part 3: Algorithm Description}
+
+The overall algorithm can be described as follows:
+
+\begin{itemize}
+    \item Perform DFS starting from the root \( r \).
+    \item During the DFS, for each node \( v \):
+    \begin{itemize}
+        \item Recursively compute \( d[u] \) for each child \( u \in C(v) \).
+        \item Update \( d[v] \) as:
+        \[
+        d[v] = \sum_{u \in C(v)} d[u] + \left( \text{descendants at exactly distance } K \right)
+        \]
+    \end{itemize}
+    \item The DFS ensures that all vertices are processed, and their \( d[v] \)-values are computed based on their children.
+\end{itemize}
+
+\subsection*{Time Complexity}
+Since we are performing a Depth-First Search (DFS) traversal of the tree, the algorithm visits each vertex and edge exactly once. Therefore, the time complexity of the algorithm is:
+
+\[
+O(|V|)
+\]
+
+This ensures that the algorithm is efficient and runs in linear time with respect to the number of vertices in the tree.
+
+\newpage
+\section*{4. Depth First Search}
+
+\subsection*{(a) Maximum edge weight from root to \( v \)}
+
+Computing the maximum edge weight along the path from the root \( r \) to each vertex \( v \) and storing the result in \( L[v] \).
+
+\begin{itemize}
+    \item \textbf{PreVisit(u, v)}: If \( v \) is not the root, update \( L[v] \) as the maximum of \( L[u] \) and \( wt(u, v) \), i.e.,
+    \[
+    L[v] = \max(L[u], wt(u, v))
+    \]
+    \item \textbf{PostVisit(u, v)}: No action is needed in this case.
+\end{itemize}
+
+\subsection*{(b) Maximum edge weight in the subtree of \( v \)}
+
+For each vertex \( v \), we need to compute the maximum weight of any edge in the subtree rooted at \( v \) and store the result in \( L[v] \).
+
+\begin{itemize}
+    \item \textbf{PreVisit(u, v)}: No action is needed in the pre-visit.
+    \item \textbf{PostVisit(u, v)}: After exploring a child \( v \), update \( L[u] \) to be the maximum of \( L[u] \) and \( L[v] \), i.e.,
+    \[
+    L[u] = \max(L[u], L[v], wt(u, v))
+    \]
+\end{itemize}
+
+\subsection*{(c) Depth of the tree rooted at \( v \)}
+
+The depth of the tree rooted at \( v \), defined as the length of the longest path from \( v \) to a leaf in its subtree, should be stored in \( L[v] \).
+
+\begin{itemize}
+    \item \textbf{PreVisit(u, v)}: No action is needed in the pre-visit.
+    \item \textbf{PostVisit(u, v)}: After exploring a child \( v \), update \( L[u] \) as:
+    \[
+    L[u] = \max(L[u], L[v] + wt(u, v))
+    \]
+\end{itemize}
+
+\subsection*{(d) Maximum degree among children of \( v \)}
+
+For each vertex \( v \), we want to compute the maximum degree among all its children and store the result in \( L[v] \).
+
+\begin{itemize}
+    \item \textbf{PreVisit(u, v)}: No action is needed in the pre-visit.
+    \item \textbf{PostVisit(u, v)}: After exploring each child \( v \), update \( L[u] \) to be the maximum of \( L[u] \) and the number of children of \( v \), i.e.,
+    \[
+    L[u] = \max(L[u], \text{degree}(v))
+    \]
+\end{itemize}
+
+\newpage
+\section*{5. Topological Sort Proofs}
+\subsection*{(a) Semiconnectedness of a DAG}
+
+A directed acyclic graph \( G \) is said to be \emph{semiconnected} if for any two vertices \( A \) and \( B \), there is either a path from \( A \) to \( B \) or from \( B \) to \( A \). We need to prove that \( G \) is semiconnected if and only if there exists a directed path that visits all of the vertices in \( G \).
+
+\textbf{Proof:}
+
+\begin{itemize}
+    \item \textbf{(If direction)}: 
+    Assume that \( G \) has a directed path that visits all the vertices in the graph. Let the path be \( P = (v_1, v_2, \dots, v_n) \), where each \( v_i \) is a vertex in \( G \). 
+    For any two vertices \( A \) and \( B \), the path \( P \) guarantees that either \( A \) appears before \( B \) or \( B \) appears before \( A \) in the path, meaning there is either a path from \( A \) to \( B \) or from \( B \) to \( A \). 
+    Hence, \( G \) is semiconnected.
+
+    \item \textbf{(Only if direction)}: 
+    Now, assume that \( G \) is semiconnected, i.e., for any pair of vertices \( A \) and \( B \), there is a directed path from \( A \) to \( B \) or from \( B \) to \( A \). 
+    Consider a topological ordering of the vertices. In a semiconnected graph, since there is a path between every pair of vertices, this topological order must consist of a single directed path that visits all the vertices in \( G \).
+    Therefore, \( G \) must have a directed path that visits all of its vertices.
+\end{itemize}
+
+Thus, we have proved both sides of the "if and only if" condition.
+
+\subsection*{(b) Uniqueness of Topological Ordering in a DAG}
+
+We need to show that a DAG has a unique topological ordering if and only if it has a directed path that visits all of its vertices.
+
+\textbf{Proof:}
+
+\begin{itemize}
+    \item \textbf{(If direction)}: 
+    Assume that the DAG has a directed path that visits all of its vertices. 
+    In this case, there is only one way to arrange the vertices in a topological order — the order in which they appear in the directed path. Therefore, the topological ordering is unique.
+
+    \item \textbf{(Only if direction)}: 
+    Now, assume that the DAG has a unique topological ordering. 
+    If there were no directed path visiting all the vertices, there would exist two or more vertices that could be ordered in multiple ways (since they would not have a direct path between them), resulting in multiple valid topological orderings. 
+    Since the ordering is unique, there must exist a single directed path that visits all the vertices.
+\end{itemize}
+
+Therefore, the DAG has a unique topological ordering if and only if it has a directed path visiting all vertices.
+
+\subsection*{(c) Topological Sorting on a Graph with Cycles}
+
+This subpart asks us to consider what would happen if we ran the topological sorting algorithm on a directed graph that contains cycles.
+
+\textbf{Claim:} The algorithm would output an ordering with the least number of edges pointing backwards.
+
+\textbf{Proof:}
+
+This statement is \emph{false}. Topological sorting algorithms are designed to work on DAGs (Directed Acyclic Graphs). If the graph contains cycles, the algorithm will detect the cycles during the sorting process, and it will not produce any valid ordering.
+
+In fact, standard topological sorting algorithms (such as DFS-based topological sort) will fail if they encounter a cycle, as they rely on the absence of cycles to correctly order vertices. Specifically:
+\begin{itemize}
+    \item \textbf{DFS-based topological sort}: In this algorithm, if a back edge (which forms a cycle) is encountered, it indicates the presence of a cycle, and no valid topological order can be produced.
+\end{itemize}
+
+Therefore, the algorithm will not output any meaningful ordering when applied to a graph with cycles, as topological sorting is not defined for such graphs.
+
+\end{document}
