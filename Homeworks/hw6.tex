@@ -1,0 +1,312 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,enumerate}
+
+\def\Name{Kartikeya Sharma}  % Your name
+\def\SID{3037376860}  % Your student ID number
+\def\Homework{6 } % Number of Homework
+\def\Session{Fall 2024}
+
+
+\title{COMPSCI 170 Fall 2024 --- Homework \Homework Solutions}
+\author{\Name, SID \SID}
+\markboth{CS70--\Session\  Homework \Homework\ \Name}{CS170 -- \Session\ Homework \Homework\ \Name}
+\pagestyle{myheadings}
+\date{\today}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\textheight=9in
+\textwidth=6.5in
+\topmargin=-.75in
+\oddsidemargin=0.25in
+\evensidemargin=0.25in
+
+
+\begin{document}
+
+\maketitle
+
+\section*{Q1 Study Group}
+
+\textbf{none}
+
+\newpage
+
+\section*{Q2 Firefighters}
+
+\subsection*{1. Algorithm Description}
+
+Selecting \( K \) cities to place fire stations such that the maximum response time \( R \) is minimized. The response time for a city is defined as the distance to its nearest fire station.
+
+\textbf{Algorithm (Greedy Approach):}
+
+\begin{enumerate}
+    \item \textbf{Initialization:}
+    \begin{itemize}
+        \item Start with an empty set of fire stations \( S \).
+        \item Let the response time for each city initially be the distance to the nearest fire station, set to infinity for all cities.
+    \end{itemize}
+
+    \item \textbf{First Station Selection:}
+    \begin{itemize}
+        \item Select an arbitrary city \( C_1 \) as the location for the first fire station. Update the response times of all cities based on their distance to \( C_1 \).
+    \end{itemize}
+
+    \item \textbf{Iterative Station Placement:}
+    \begin{itemize}
+        \item For each of the remaining \( K-1 \) fire stations:
+        \begin{enumerate}
+            \item Identify the city \( C_j \) that has the largest current response time (i.e., the city farthest from any already placed fire stations).
+            \item Place a fire station at city \( C_j \) and update the response times of all cities as the minimum of their current response time and the distance to \( C_j \).
+        \end{enumerate}
+    \end{itemize}
+
+    \item \textbf{Termination:}
+    \begin{itemize}
+        \item After placing \( K \) fire stations, the maximum response time across all cities is the final result of the algorithm.
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Input:} Matrix \( D \) representing the shortest path distances between each pair of cities, and the number of fire stations \( K \).
+
+\textbf{Output:} The set of fire stations and the maximum response time \( R_g \).
+
+\subsection*{2. Proof of Correctness}
+
+We need to prove that the greedy algorithm achieves a maximum response time \( R_g \leq 2 \cdot R_{\text{opt}} \), where \( R_{\text{opt}} \) is the optimal maximum response time.
+
+\begin{itemize}
+    \item \textbf{Optimal Insight:}
+    In the optimal solution, no city is more than \( R_{\text{opt}} \) away from its nearest fire station. The greedy algorithm attempts to mimic this by always selecting the city with the highest current response time to place the next fire station, thereby ensuring that this city’s response time improves significantly.
+
+    \item \textbf{Greedy Approximation:}
+    At each iteration, the greedy algorithm minimizes the worst-case scenario by placing a fire station in the city that is currently furthest from any existing fire stations. The worst-case city after each iteration can only be as far as \( 2 \cdot R_{\text{opt}} \), because:
+    \begin{itemize}
+        \item The city farthest from all fire stations in the current greedy iteration must be within \( R_{\text{opt}} \) of some fire station in the optimal solution.
+        \item By placing a new fire station at this farthest city, the algorithm ensures that no city will be more than twice as far as it would have been in the optimal case (since all other cities are no further than \( R_{\text{opt}} \) from a fire station in the optimal solution).
+    \end{itemize}
+\end{itemize}
+
+Thus, the algorithm guarantees that the maximum response time \( R_g \) satisfies:
+
+\[
+R_g \leq 2 \cdot R_{\text{opt}}
+\]
+
+This proves that the greedy algorithm provides an approximation factor of 2.
+
+\subsection*{3. Runtime Analysis}
+
+The algorithm consists of \( K \) iterations (one for each fire station placed). In each iteration, we must:
+\begin{itemize}
+    \item Identify the city with the maximum response time. This requires checking the response time for each city, which takes \( O(N) \) operations.
+    \item After placing a new fire station, we update the response times for all cities, which again takes \( O(N) \) operations.
+\end{itemize}
+
+Thus, the time complexity for one iteration is \( O(N) \), and since there are \( K \) iterations, the total time complexity of the algorithm is:
+
+\[
+O(N^2 \cdot K)
+\]
+
+This is an efficient solution for the given problem, with each iteration ensuring that we place the fire station in the city that maximizes coverage.
+
+\newpage
+
+\section*{Q3 Updating a MST}
+
+Given a graph \( G = (V, E) \) with positive edge weights and a minimum spanning tree \( T = (V, E') \). The weight of an edge \( e \in E \) is changed from \( w(e) \) to \( \hat{w}(e) \). We need to update the MST efficiently based on the new weight \( \hat{w}(e) \), handling the following four cases.
+
+\subsection*{Case (a): \( e \in E' \) and \( \hat{w}(e) < w(e) \)}
+
+\subsubsection*{1. Algorithm Description}
+Since \( e \in E' \), \( e \) is already part of the MST. Decreasing its weight will only strengthen its inclusion in the MST, so we do not need to remove any edges.
+\begin{itemize}
+    \item \textbf{Action:} Simply update the weight of \( e \) in the MST.
+\end{itemize}
+
+\subsubsection*{2. Proof of Correctness}
+Since reducing the weight of an edge already in the MST cannot introduce a cycle or invalidate the tree, the MST remains optimal. No alternative edge can provide a better spanning tree because \( e \) is now more optimal.
+
+\subsubsection*{3. Runtime Analysis}
+Updating the weight of an edge in the MST is a constant time operation, so the runtime is \( O(1) \).
+
+\subsection*{Case (b): \( e \notin E' \) and \( \hat{w}(e) < w(e) \)}
+
+\subsubsection*{1. Algorithm Description}
+Since \( e \notin E' \), it is not part of the MST. However, since its weight is reduced, it may now become a candidate for inclusion in the MST.
+\begin{itemize}
+    \item \textbf{Action:}
+    \begin{enumerate}
+        \item Add \( e \) to the MST.
+        \item This creates a cycle. Remove the heaviest edge in the cycle to restore the tree structure.
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection*{2. Proof of Correctness}
+Adding \( e \) to the MST introduces a cycle. Removing the heaviest edge from this cycle ensures that we still have a valid spanning tree with minimum total weight. This ensures that the MST properties are maintained.
+
+\subsubsection*{3. Runtime Analysis}
+Detecting the cycle and finding the heaviest edge takes \( O(V) \). Therefore, the total runtime is \( O(V) \).
+
+\subsection*{Case (c): \( e \in E' \) and \( \hat{w}(e) > w(e) \)}
+
+\subsubsection*{1. Algorithm Description}
+Since \( e \in E' \) and its weight is increased, it might no longer be the best edge to connect its endpoints.
+\begin{itemize}
+    \item \textbf{Action:}
+    \begin{enumerate}
+        \item Remove \( e \) from the MST.
+        \item Find the minimum-weight edge that reconnects the two components that were split by removing \( e \).
+        \item Add this minimum-weight edge to the MST.
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection*{2. Proof of Correctness}
+By removing \( e \), we split the tree into two components. Finding the minimum-weight edge that reconnects these two components guarantees that the MST remains valid and minimizes the total weight.
+
+\subsubsection*{3. Runtime Analysis}
+Removing an edge takes \( O(1) \). Finding the minimum-weight edge to reconnect the components takes \( O(E) \), as we may need to check all edges. Thus, the total runtime is \( O(E) \).
+
+\subsection*{Case (d): \( e \notin E' \) and \( \hat{w}(e) > w(e) \)}
+
+\subsubsection*{1. Algorithm Description}
+Since \( e \notin E' \), and its weight has increased, it cannot become part of the MST.
+\begin{itemize}
+    \item \textbf{Action:} Do nothing, as the MST remains unchanged.
+\end{itemize}
+
+\subsubsection*{2. Proof of Correctness}
+Since \( e \) was not in the MST originally and its weight has increased, there is no reason to include it in the MST now. Therefore, the MST remains optimal.
+
+\subsubsection*{3. Runtime Analysis}
+No operation is needed, so the runtime is \( O(1) \).
+
+\newpage
+
+
+
+
+
+\section*{Q4 Minimum Spanning k-Fores}
+
+Given a graph \( G(V, E) \) with nonnegative weights, a spanning k-forest is a cycle-free collection of edges \( F \subseteq E \) such that the graph with the same vertices as \( G \), but only the edges in \( F \), has \( k \) connected components. The **minimum spanning k-forest** is the spanning k-forest with the minimum total edge weight. We are tasked with finding an efficient algorithm to compute this forest and proving key properties about the structure of the k-forest.
+
+\subsection*{Part (a): j-partition and Crossings}
+
+\textbf{Definition of a j-partition:} 
+A **j-partition** of a graph \( G \) is a partition of the vertices \( V \) into \( j \) (non-empty) sets \( \Pi = \{S_1, S_2, \dots, S_j\} \) such that:
+\begin{itemize}
+    \item Each \( S_i \) includes at least one vertex.
+    \item Every vertex in \( G \) appears in exactly one set \( S_i \).
+\end{itemize}
+
+For example, if the vertices of a graph are \( \{A, B, C, D, E\} \), a 3-partition could be \( \Pi = \{\{A, B\}, \{C\}, \{D, E\}\} \).
+
+\textbf{Crossing edges:} 
+An edge \( (u, v) \) is said to be \emph{crossing} a j-partition \( \Pi = \{S_1, S_2, \dots, S_j\} \) if the set containing \( u \) and the set containing \( v \) are different. For example, for the 3-partition \( \Pi = \{\{A, B\}, \{C\}, \{D, E\}\} \), an edge from \( A \) to \( C \) crosses the partition.
+
+\textbf{Proof: The Lightest Crossing Edge Must Be in the Minimum Spanning k-Forest}
+
+Let \( \Pi \) be any j-partition of a graph \( G \), where \( j > k \). To reduce the number of connected components from \( j \) to \( j-1 \), we must add an edge that crosses \( \Pi \).
+
+By the properties of spanning trees (or forests), if we want to maintain the minimum weight, the lightest edge crossing the partition must be in the minimum spanning k-forest. Including any heavier edge would result in a higher total weight, violating the minimality of the k-forest.
+
+Thus, for any j-partition \( \Pi \) where \( j > k \), the lightest edge crossing the partition must be included in the minimum spanning k-forest of \( G \).
+
+\subsection*{Part (b): Algorithm for Finding the Minimum Spanning k-Forest}
+
+\textbf{Algorithm: Modified Kruskal's Algorithm for k-forest}
+
+To find the minimum spanning k-forest, we can modify Kruskal's algorithm as follows:
+
+\begin{enumerate}
+    \item Initialize the forest with no edges, and treat each vertex of \( G \) as an individual component (thus initially, we have \( |V| \) components).
+    
+    \item Sort all edges of the graph \( G \) by increasing weight.
+    
+    \item For each edge \( e = (u, v) \), check if \( u \) and \( v \) are in the same connected component:
+    \begin{itemize}
+        \item If they are in different components, add \( e \) to the forest and merge the components containing \( u \) and \( v \).
+        \item Stop when exactly \( k \) components remain (i.e., when we have formed the desired k-forest).
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Input:} Graph \( G(V, E) \) and an integer \( k \) indicating the number of components in the desired k-forest.
+
+\textbf{Output:} The edges of the minimum spanning k-forest.
+
+\subsection*{Proof of Correctness}
+This modified version of Kruskal’s algorithm works because it progressively adds the smallest possible edges while maintaining the forest structure, just as the regular Kruskal’s algorithm does for an MST. The only difference is that the algorithm terminates early, once we have \( k \) connected components instead of a single spanning tree.
+
+The proof follows from the same arguments used in Kruskal's algorithm: each edge added is the smallest edge crossing the current forest, and adding any larger edge would create a heavier forest. Since the process stops only when \( k \) components remain, the forest is minimal with respect to total weight, and thus it is the minimum spanning k-forest.
+
+\subsection*{Runtime Analysis}
+
+The runtime of the modified Kruskal’s algorithm is as follows:
+\begin{itemize}
+    \item Sorting the edges takes \( O(E \log E) \).
+    \item Each union and find operation in the disjoint-set data structure takes \( O(\log V) \) time using path compression and union by rank.
+    \item Since we are adding \( |V| - k \) edges (one for each merge operation until \( k \) components remain), the total number of operations is \( O(E \log V) \).
+\end{itemize}
+
+Thus, the total runtime of the algorithm is \( O(E \log E + E \log V) \), which simplifies to \( O(E \log V) \), since \( \log V \) is generally larger than \( \log E \) for sparse graphs.
+
+
+\newpage
+
+\section*{Q5 Copper Pipes}
+
+Bubbles has a copper pipe of length \( n \) inches and an array of nonnegative integers representing prices of all pieces of size at most \( n \). The goal is to find the maximum value obtainable by cutting the pipe into smaller pieces and selling them. The length-to-price mapping is provided.
+
+\section*{Dynamic Programming Algorithm}
+
+Uuse a dynamic programming approach, similar to the rod cutting problem. We define an array \( \text{dp}[i] \) where \( \text{dp}[i] \) stores the maximum obtainable value for a pipe of length \( i \).
+
+\subsection*{Algorithm Description}
+
+\begin{enumerate}
+    \item Let \( n \) be the total length of the pipe and \( \text{prices} \) be the array where \( \text{prices}[i] \) represents the price of a piece of length \( i \).
+    \item Initialize an array \( \text{dp}[] \) of size \( n+1 \) where each entry is initialized to 0. \( \text{dp}[i] \) will store the maximum obtainable value for a pipe of length \( i \).
+    \item The recurrence relation is defined as follows:
+    \[
+    \text{dp}[i] = \max_{1 \leq j \leq i} (\text{prices}[j] + \text{dp}[i-j])
+    \]
+    This means for each length \( i \), we iterate over all possible first cuts of length \( j \), then add the price for the piece of length \( j \) and the maximum obtainable value for the remaining part of the pipe, \( i - j \).
+    \item Iterate over all lengths from 1 to \( n \) and fill the \( \text{dp}[] \) array using the recurrence relation.
+    \item Finally, \( \text{dp}[n] \) will contain the maximum value obtainable for a pipe of length \( n \).
+\end{enumerate}
+
+\subsection*{Example}
+
+For a pipe of length 8 with the following prices:
+
+\[
+\begin{array}{c|c c c c c c c c}
+\text{Length} & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+\hline
+\text{Price}  & 1 & 5 & 8 & 9 & 10 & 17 & 17 & 20 \\
+\end{array}
+\]
+
+We want to compute \( \text{dp}[8] \). Using the recurrence relation:
+
+\[
+\text{dp}[8] = \max(\text{prices}[1] + \text{dp}[7], \text{prices}[2] + \text{dp}[6], \dots, \text{prices}[8] + \text{dp}[0])
+\]
+
+The final solution is \( \text{dp}[8] = 22 \), which can be obtained by cutting the pipe into two pieces of lengths 6 and 2.
+
+\section*{Runtime Analysis}
+
+The time complexity of this dynamic programming algorithm is \( O(n^2) \), where \( n \) is the length of the pipe. This is because for each length \( i \), we iterate through all possible cuts from 1 to \( i \), resulting in a nested loop with quadratic complexity.
+
+The space complexity is \( O(n) \), as we are using an array \( \text{dp}[] \) of size \( n+1 \) to store the maximum obtainable values for each pipe length.
+
+\newpage
+
+
+
+\end{document}
