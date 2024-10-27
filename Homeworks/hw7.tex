@@ -1,0 +1,247 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,enumerate}
+
+\def\Name{Kartikeya Sharma}  % Your name
+\def\SID{3037376860}  % Your student ID number
+\def\Homework{7 } % Number of Homework
+\def\Session{Fall 2024}
+
+
+\title{COMPSCI 170 Fall 2024 --- Homework \Homework Solutions}
+\author{\Name, SID \SID}
+\markboth{CS70--\Session\  Homework \Homework\ \Name}{CS170 -- \Session\ Homework \Homework\ \Name}
+\pagestyle{myheadings}
+\date{\today}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\textheight=9in
+\textwidth=6.5in
+\topmargin=-.75in
+\oddsidemargin=0.25in
+\evensidemargin=0.25in
+
+
+\begin{document}
+
+\maketitle
+
+\section*{Q1 Study Group}
+
+\textbf{none}
+
+
+
+\newpage
+
+
+\section*{Q2 Egg Drop Problem Solution}
+
+We are given \( m \) identical eggs and an \( n \)-story building, and we need to figure out the minimum number of egg drops required to find the highest floor \( b \) from which an egg can be dropped without breaking.
+
+Let \( f(n, m) \) represent the minimum number of drops required to find \( b \) using \( m \) eggs and a building with \( n \) floors.
+
+\subsection*{1. Define the function \( f(\cdot) \)}
+Let \( f(n, m) \) be the minimum number of drops required to find \( b \), the critical floor, with \( n \) floors and \( m \) eggs. 
+The inputs are:
+\begin{itemize}
+    \item \( n \): the number of floors in the building.
+    \item \( m \): the number of eggs available.
+\end{itemize}
+The function \( f(n, m) \) outputs the minimum number of drops required to identify the critical floor \( b \) in the worst-case scenario.
+
+\subsection*{2. Recurrence relation and base cases}
+The recurrence relation can be described as follows:
+\[
+f(n, m) = 1 + \min_{1 \leq h \leq n} \left( \max(f(h-1, m-1), f(n-h, m)) \right)
+\]
+This means that for each floor \( h \), we consider two possibilities:
+\begin{itemize}
+    \item If the egg breaks, we are left with \( m-1 \) eggs and \( h-1 \) floors to check below \( h \).
+    \item If the egg does not break, we are left with \( m \) eggs and \( n-h \) floors above \( h \) to check.
+\end{itemize}
+The worst-case scenario is the maximum of these two, and we want to minimize the number of drops, so we take the minimum over all floors.
+
+The base cases are:
+\begin{align*}
+    f(1, m) &= 1 \quad \text{(with one floor, only one drop is needed)} \\
+    f(n, 1) &= n \quad \text{(with one egg, we need to try every floor)} \\
+    f(0, m) &= 0 \quad \text{(no floors require no drops)} \\
+    f(n, 0) &= \infty \quad \text{(impossible to solve with no eggs)}
+\end{align*}
+
+\subsection*{3. Proving correctness}
+To prove the correctness of the recurrence, we use induction.
+
+\textbf{Base Case:} For \( n = 1 \) floor, \( f(1, m) = 1 \) holds true because only one drop is required. Similarly, for \( m = 1 \) egg, \( f(n, 1) = n \) is correct because we must check every floor sequentially.
+
+\textbf{Inductive Step:} Assume that the recurrence holds for all buildings with \( k \leq n-1 \) floors. Then for \( n \) floors and \( m \) eggs, dropping an egg from floor \( h \) leads to two cases, as mentioned. By the induction hypothesis, the subproblems \( f(h-1, m-1) \) and \( f(n-h, m) \) are solved optimally. Therefore, the recurrence relation ensures that \( f(n, m) \) solves the problem correctly in the worst case.
+
+\subsection*{4. Time and space complexity analysis}
+The time complexity of solving this problem using dynamic programming is \( O(n \times m) \), as we compute the solution for each subproblem \( f(n, m) \) once and store it in a table.
+
+The space complexity depends on how we store the intermediate results. Using a bottom-up approach and a 2D table to store the values of \( f(n, m) \), the space complexity is \( O(n \times m) \).
+
+\textbf{Optimization:} We can optimize the space complexity by noting that we only need the values from the previous row (previous number of eggs) at each step. Therefore, we can reduce the space complexity to \( O(n) \) by storing only two rows at a time in a rolling array.
+
+
+
+\newpage
+
+
+\section*{Q3 Counting Targets Solution}
+
+We are given a sequence of \( n \) integers \( x_1, \dots, x_n \), each of which is valid if \( x_i \in \{1, \dots, m\} \). We are asked to find the number of valid sequences such that the sum of these integers equals a given target \( T \). We will solve this problem using dynamic programming.
+
+\subsection*{1. Define the function \( f(\cdot) \)}
+Let \( f(i, S) \) represent the number of valid sequences that sum to \( S \) using the first \( i \) elements of the sequence.
+
+The inputs are:
+\begin{itemize}
+    \item \( i \): the number of elements considered in the sequence.
+    \item \( S \): the current sum we are trying to achieve.
+\end{itemize}
+
+The function \( f(i, S) \) outputs the number of valid ways to select the first \( i \) elements so that their sum equals \( S \).
+
+\subsection*{2. Recurrence relation and base cases}
+To compute \( f(i, S) \), we have the option to add any \( x_i \in \{1, 2, \dots, m\} \). This leads to the following recurrence relation:
+\[
+f(i, S) = \sum_{x_i=1}^{m} f(i-1, S - x_i)
+\]
+That is, for each possible value \( x_i \) from \( 1 \) to \( m \), we check how many ways there are to achieve the sum \( S - x_i \) using the first \( i-1 \) elements.
+
+The base cases are:
+\begin{align*}
+f(0, 0) &= 1 \quad \text{(one way to achieve sum 0 with no elements)} \\
+f(0, S) &= 0 \quad \text{(no way to achieve a non-zero sum with no elements)} \\
+f(i, S) &= 0 \quad \text{(no way to achieve a negative sum, so if \( S < 0 \))}
+\end{align*}
+
+\subsection*{3. Proving correctness}
+The recurrence is built on the principle of counting all possible ways to form valid sequences. By summing over all possible values for \( x_i \), we ensure that all valid sequences are considered. The base cases guarantee that we can build up the solution from simple scenarios, and the recurrence handles progressively larger subsequences, eventually solving for the entire sequence.
+
+\subsection*{4. Time and space complexity analysis}
+The time complexity is \( O(m n^2) \) because:
+\begin{itemize}
+    \item We have \( n \) stages (one for each element in the sequence).
+    \item For each stage, we compute \( f(i, S) \) for every sum \( S \) up to \( T \).
+    \item For each \( f(i, S) \), we perform a summation over \( m \) possible values of \( x_i \).
+\end{itemize}
+Thus, the total complexity is \( O(m n^2) \).
+
+The space complexity is \( O(n T) \) because we need to store the values of \( f(i, S) \) for all \( i \) and \( S \).
+
+\section*{Extra Credit Solution}
+To improve the time complexity to \( O(mn^2) \), we observe that we can maintain a rolling sum of the values \( f(i-1, S - x_i) \) for all \( x_i \). Instead of computing the summation from scratch for each \( f(i, S) \), we can build the sum iteratively and update it as we move through the values of \( S \).
+
+The recurrence relation remains the same, but we modify the way the summation is calculated. By leveraging the fact that the values for \( S - x_i \) are computed in sequence, we avoid redundant computations.
+
+This leads to a total time complexity of \( O(mn^2) \) and the same space complexity of \( O(nT) \).
+
+
+\newpage
+
+
+\section*{Q4 String Shuffling Solution}
+
+We are given three strings \( x \), \( y \), and \( z \), and we want to determine if \( z \) can be obtained by interleaving the characters of \( x \) and \( y \) such that the characters of \( x \) appear in order, and the characters of \( y \) also appear in order.
+
+\subsection*{1. Define the function \( f(\cdot) \)}
+Let \( f(i, j) \) be a boolean function that returns whether the prefix of length \( i \) from string \( x \) and the prefix of length \( j \) from string \( y \) can interleave to form the prefix of length \( i + j \) of string \( z \).
+
+The inputs are:
+\begin{itemize}
+    \item \( i \): the number of characters considered from string \( x \).
+    \item \( j \): the number of characters considered from string \( y \).
+\end{itemize}
+
+The function \( f(i, j) \) outputs true if \( z_1, \dots, z_{i+j} \) can be obtained by interleaving the first \( i \) characters of \( x \) and the first \( j \) characters of \( y \).
+
+\subsection*{2. Recurrence relation and base cases}
+The recurrence relation for \( f(i, j) \) is:
+\[
+f(i, j) = \left( f(i-1, j) \text{ and } z_{i+j} = x_i \right) \text{ or } \left( f(i, j-1) \text{ and } z_{i+j} = y_j \right)
+\]
+This means that \( z_{i+j} \) can either come from the \( i \)-th character of \( x \), in which case the rest of the prefix should match \( f(i-1, j) \), or from the \( j \)-th character of \( y \), in which case the rest of the prefix should match \( f(i, j-1) \).
+
+The base cases are:
+\begin{align*}
+f(0, 0) &= \text{true} \quad \text{(no characters from either string trivially interleave)} \\
+f(i, 0) &= \left( z_1, \dots, z_i = x_1, \dots, x_i \right) \quad \text{(all characters must match from \( x \))} \\
+f(0, j) &= \left( z_1, \dots, z_j = y_1, \dots, y_j \right) \quad \text{(all characters must match from \( y \))}
+\end{align*}
+
+\subsection*{3. Proving correctness}
+The recurrence relation ensures that we only form the interleaving by taking characters from \( x \) and \( y \) in the correct order. The two possible transitions account for whether we are currently matching a character from \( x \) or from \( y \). The base cases correctly handle the situations when one of the strings is empty.
+
+Thus, the recurrence correctly tracks whether a valid interleaving can be formed at each step.
+
+\subsection*{4. Time complexity analysis}
+The time complexity of this algorithm is \( O(|x| \times |y|) \) because we fill out a table of size \( |x| \times |y| \), and each entry in the table requires \( O(1) \) work to compute based on the two previous subproblems.
+
+\section*{(b) Space Optimization}
+The space complexity of the naive DP solution is \( O(|x| \times |y|) \) since we store results for all possible combinations of prefixes of \( x \) and \( y \). 
+
+However, if we observe the recurrence closely, we see that at any point, we only need the values from the current row and the previous row. Therefore, instead of maintaining a 2D table, we can optimize the space complexity to \( O(\min(|x|, |y|)) \) by using a rolling array that keeps track of only the previous row.
+
+By reusing space in this manner, we significantly reduce the space complexity, which is beneficial especially when \( |x| \) and \( |y| \) are large.
+
+
+
+\newpage
+
+
+\section*{Q5 My Dog Ate My Homework Solution}
+
+We are given an \( x \times y \) rectangular grid of squares representing a piece of paper, where some squares have holes (denoted by 1) and the rest are intact (denoted by 0). The goal is to find the minimum number of cuts (horizontal or vertical) required to separate the grid into pieces such that each piece is either completely intact (all 0) or completely bitten (all 1).
+
+\subsection*{(a) Define the subproblem}
+
+Let \( f(x_1, y_1, x_2, y_2) \) be the minimum number of cuts required to separate the sub-grid defined by the top-left corner \( (x_1, y_1) \) and the bottom-right corner \( (x_2, y_2) \) into valid pieces.
+
+The inputs are:
+\begin{itemize}
+    \item \( x_1, y_1 \): the coordinates of the top-left corner of the current sub-grid.
+    \item \( x_2, y_2 \): the coordinates of the bottom-right corner of the current sub-grid.
+\end{itemize}
+
+The output \( f(x_1, y_1, x_2, y_2) \) is the minimum number of cuts required to separate the sub-grid into valid pieces.
+
+\subsection*{(b) Recurrence relation}
+
+If the sub-grid is already uniform (all 0s or all 1s), then no cuts are needed:
+\[
+f(x_1, y_1, x_2, y_2) = 0 \quad \text{if all elements in the sub-grid are either 0 or 1.}
+\]
+
+Otherwise, we need to try cutting the sub-grid either horizontally or vertically and solve the resulting subproblems. The recurrence relation is:
+\[
+f(x_1, y_1, x_2, y_2) = 1 + \min \left( 
+    \min_{x_1 \leq x < x_2} \left( f(x_1, y_1, x, y_2) + f(x+1, y_1, x_2, y_2) \right), 
+    \min_{y_1 \leq y < y_2} \left( f(x_1, y_1, x_2, y) + f(x_1, y+1, x_2, y_2) \right)
+\right)
+\]
+This means we make one cut either horizontally or vertically, and then recursively solve the subproblems for the resulting two sub-grids.
+
+\subsection*{(c) Order of solving subproblems}
+
+We solve the subproblems in increasing order of sub-grid size, starting from the smallest sub-grids and building up to larger sub-grids. Specifically, we begin with sub-grids of size \( 1 \times 1 \) (which are trivial), then solve for \( 1 \times 2 \), \( 2 \times 1 \), etc., until we solve for the entire grid of size \( x \times y \).
+
+Dynamic programming will be used to store the result of each subproblem \( f(x_1, y_1, x_2, y_2) \), and we will reuse these results to solve larger subproblems.
+
+\subsection*{(d) Runtime complexity}
+
+In the worst case, we need to consider every possible sub-grid of the \( x \times y \) grid. There are \( O(x^2 \times y^2) \) possible sub-grids. For each sub-grid, we attempt cuts at all possible positions, which requires \( O(x + y) \) operations.
+
+Thus, the total runtime complexity is \( O(x^3 y^3) \).
+
+\subsection*{(e) Space complexity}
+
+We need to store the result of each subproblem \( f(x_1, y_1, x_2, y_2) \), which requires a table of size \( O(x^2 y^2) \).
+
+Thus, the space complexity is \( O(x^2 y^2) \).
+
+\end{document}
