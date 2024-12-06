@@ -1,0 +1,232 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,enumerate}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+
+\def\Name{Kartikeya Sharma}  % Your name
+\def\SID{3037376860}  % Your student ID number
+\def\Homework{11 } % Number of Homework
+\def\Session{Fall 2024}
+
+
+\title{COMPSCI 170 Fall 2024 --- Homework \Homework Solutions}
+\author{\Name, SID \SID}
+\markboth{CS70--\Session\  Homework \Homework\ \Name}{CS170 -- \Session\ Homework \Homework\ \Name}
+\pagestyle{myheadings}
+\date{\today}
+
+\newenvironment{qparts}{\begin{enumerate}[{(}a{)}]}{\end{enumerate}}
+\def\endproofmark{$\Box$}
+\newenvironment{proof}{\par{\bf Proof}:}{\endproofmark\smallskip}
+
+\textheight=9in
+\textwidth=6.5in
+\topmargin=-.75in
+\oddsidemargin=0.25in
+\evensidemargin=0.25in
+
+
+\begin{document}
+
+\maketitle
+
+\section*{Q1 Study Group}
+
+\textbf{none}
+
+\newpage
+
+
+\section*{Q2}
+\subsection*{Part (a): Solving the Search Problem Using the Decision Problem}
+\textbf{Goal:} Given a polynomial-time solution to the \textit{Vertex Cover Decision Problem}, we need to use it to find a vertex cover of size \( b \) if one exists.
+
+
+\begin{enumerate}
+    \item \textbf{Initial Check with Decision Problem}
+    \begin{itemize}
+        \item Use the decision problem to check if there exists a vertex cover of size \( b \) in the graph \( G \).
+        \item If the decision problem returns \textbf{NO}, then there is no vertex cover of size \( b \) for \( G \), so the search problem has no solution.
+        \item If the decision problem returns \textbf{YES}, proceed to the next steps to find this cover.
+    \end{itemize}
+    
+    \item \textbf{Iteratively Identify Vertices in the Cover}
+    \begin{itemize}
+        \item Initialize an empty set \( C \) to hold the vertices that will be part of the vertex cover.
+    \end{itemize}
+
+    \item \textbf{Process Each Vertex}
+    \begin{itemize}
+        \item For each vertex \( v \) in \( G \), do the following:
+        \begin{enumerate}
+            \item Temporarily \textbf{remove} \( v \) from the graph, forming a modified graph \( G' = G - v \).
+            \item Use the decision problem on \( G' \) with size parameter \( b-1 \).
+            \item \textbf{If the decision problem returns YES} on \( G' \), this means there exists a vertex cover of size \( b-1 \) in \( G' \), so \( v \) is \textbf{not needed in the cover}. Keep \( G' \) as the current graph \( G \) and proceed to the next vertex.
+            \item \textbf{If the decision problem returns NO} on \( G' \), then a vertex cover of size \( b-1 \) does not exist without \( v \), meaning \( v \) \textbf{must be in the cover}. Add \( v \) to \( C \) and update \( G \) to be the graph with \( v \) removed. Reduce \( b \) by 1.
+        \end{enumerate}
+    \end{itemize}
+
+    \item \textbf{Stop Condition}
+    \begin{itemize}
+        \item Continue this process until either \( b \) becomes 0 (meaning we have found a vertex cover of the required size) or there are no more vertices left to examine.
+    \end{itemize}
+
+    \item \textbf{Result}
+    \begin{itemize}
+        \item The set \( C \) will contain the vertices in a valid vertex cover of size \( b \), if such a cover exists.
+    \end{itemize}
+\end{enumerate}
+
+This approach finds the vertices in the cover by iteratively checking whether each vertex is necessary for a cover of the remaining size. Each step only requires a call to the decision problem, which we are assuming is solvable in polynomial time.
+
+
+\newpage
+
+
+\subsection*{Part (b): Solving the Optimization Problem Using the Search Problem}
+\textbf{Goal:} Given a polynomial-time solution to the \textit{Vertex Cover Search Problem}, we need to find the minimum vertex cover (the smallest set of vertices that forms a cover).
+
+
+
+\begin{enumerate}
+    \item \textbf{Define the Range for Binary Search}
+    \begin{itemize}
+        \item Let \( n \) be the total number of vertices in the graph \( G \).
+        \item We know that the size of the minimum vertex cover must lie between \( 0 \) and \( n \).
+    \end{itemize}
+
+    \item \textbf{Perform Binary Search}
+    \begin{itemize}
+        \item Set \( \text{low} = 0 \) and \( \text{high} = n \).
+        \item While \( \text{low} \leq \text{high} \):
+        \begin{enumerate}
+            \item Compute the midpoint \( m = \frac{\text{low} + \text{high}}{2} \).
+            \item Use the search problem on \( G \) with size \( m \):
+            \begin{itemize}
+                \item If the search problem returns a \textbf{valid vertex cover of size \( m \)}, then a cover of size \( m \) exists. Set \( \text{high} = m - 1 \) to check if a smaller cover exists.
+                \item If the search problem reports that \textbf{no vertex cover of size \( m \) exists}, then the minimum vertex cover must be larger than \( m \). Set \( \text{low} = m + 1 \).
+            \end{itemize}
+        \end{enumerate}
+    \end{itemize}
+
+    \item \textbf{End Condition}
+    \begin{itemize}
+        \item The binary search terminates when \( \text{low} \) exceeds \( \text{high} \). At this point, \( \text{low} \) will be the smallest size for which a vertex cover exists, which is the size of the minimum vertex cover.
+        \item To get the actual vertices in this minimum cover, perform one more call to the search problem with \( b = \text{low} \), which will return the vertex set forming the minimum cover.
+    \end{itemize}
+\end{enumerate}
+
+This approach allows us to find the minimum vertex cover size and the actual vertices in that cover by performing \( O(\log n) \) calls to the search problem, each of which we assume is solvable in polynomial time.
+
+\newpage
+
+
+\section*{Q3}
+
+\begin{enumerate}
+    \item \textbf{Partition Problem}: Given an array \( A = [a_1, a_2, \dots, a_n] \) of nonnegative integers, determine whether there exists a subset \( S \subseteq [n] = \{1, 2, \dots, n\} \) such that:
+    \[
+    \sum_{i \in S} a_i = \sum_{j \in [n] \setminus S} a_j
+    \]
+    This is equivalent to finding a way to split \( A \) into two disjoint subsets where the sum of elements in each subset is equal.
+
+    \item \textbf{Subset Sum Problem}: Given an integer \( x \), determine whether there exists a subset \( S \subseteq [n] \) such that:
+    \[
+    \sum_{i \in S} a_i = x
+    \]
+    This problem involves determining if any subset of \( A \) has a sum equal to \( x \).
+
+    \item \textbf{Knapsack Problem}: Given items with weights \( w_i \), values \( v_i \), and constraints \( W \) and \( V \), determine if there exists a subset \( S \subseteq [n] \) such that:
+    \[
+    \sum_{i \in S} w_i \leq W \quad \text{and} \quad \sum_{i \in S} v_i \geq V
+    \]
+    The goal is to find a subset of items that meets both weight and value criteria.
+\end{enumerate}
+
+\subsection*{Reduction Problems}
+
+\subsubsection*{(a) Reduction from Subset Sum to Partition}
+
+To reduce the \textbf{Subset Sum Problem} to the \textbf{Partition Problem}, given an instance of Subset Sum with an array \( A = [a_1, a_2, \dots, a_n] \) and target \( x \):
+
+\begin{enumerate}
+    \item \textbf{Construct New Array}: Define a new array \( A' = A \cup \{2x, 2x\} \), where we add two elements both equal to \( 2x \).
+    \item \textbf{Reduction Setup}: The new instance \( A' \) of the Partition Problem will have a sum \( 2 \sum A + 4x \), an even number, allowing us to look for two equal partitions.
+    \item \textbf{Correctness}: If we find a subset \( S \) in \( A \) that sums to \( x \), then \( S \cup \{2x\} \) and \( A' \setminus S \) will partition equally.
+\end{enumerate}
+
+\subsubsection*{(b) Reduction from Subset Sum to Knapsack}
+
+To reduce the \textbf{Subset Sum Problem} to the \textbf{Knapsack Problem}, given an instance of Subset Sum with array \( A = [a_1, \dots, a_n] \) and target \( x \):
+
+\begin{enumerate}
+    \item \textbf{Item Setup}: Define items where each \( a_i \) has weight \( w_i = a_i \) and value \( v_i = a_i \).
+    \item \textbf{Knapsack Parameters}: Set the knapsack's weight limit \( W = x \) and value target \( V = x \).
+    \item \textbf{Correctness}: Solving this knapsack instance determines if there is a subset of \( A \) with sum \( x \), meeting both weight and value conditions.
+\end{enumerate}
+
+\newpage
+
+\section*{Q4}
+
+To show that the \textbf{3-Coloring Problem} is NP-hard by constructing a polynomial-time reduction from \textbf{3-SAT} to 3-Coloring, I define a graph \( G = (V, E) \) such that \( G \) is 3-colorable if and only if the given 3-SAT formula \( \phi \) is satisfiable.
+
+\subsection*{Reduction Construction}
+
+Let \( \phi \) be a 3-SAT formula with variables \( x_1, x_2, \dots, x_n \) and clauses \( C_1, C_2, \dots, C_m \). We construct a graph \( G = (V, E) \) as follows:
+
+\begin{enumerate}
+    \item \textbf{Special vertices:}
+    \begin{itemize}
+        \item Create three special vertices \( v_{\text{TRUE}} \), \( v_{\text{FALSE}} \), and \( v_{\text{BASE}} \).
+        \item Add edges \( (v_{\text{TRUE}}, v_{\text{FALSE}}) \), \( (v_{\text{TRUE}}, v_{\text{BASE}}) \), and \( (v_{\text{FALSE}}, v_{\text{BASE}}) \) to ensure that these vertices take distinct colors in any valid 3-coloring.
+        \item Without loss of generality, we assign colors to these vertices such that \( v_{\text{TRUE}} \) is red, \( v_{\text{FALSE}} \) is green, and \( v_{\text{BASE}} \) is blue. These colors serve as anchors for the rest of the graph.
+    \end{itemize}
+    
+    \item \textbf{Variable vertices:}
+    \begin{itemize}
+        \item For each variable \( x_i \) in \( \phi \), create two vertices labeled \( x_i \) and \( \neg x_i \).
+        \item Add edges \( (x_i, v_{\text{TRUE}}) \) and \( (\neg x_i, v_{\text{FALSE}}) \). This construction enforces that \( x_i \) and \( \neg x_i \) must take on opposite colors: if \( x_i \) is red (the same as \( v_{\text{TRUE}} \)), then \( \neg x_i \) must be green (the same as \( v_{\text{FALSE}} \)), and vice versa.
+        \item Add an edge \( (x_i, \neg x_i) \) to prevent both \( x_i \) and \( \neg x_i \) from taking the same color.
+    \end{itemize}
+    
+    \item \textbf{Clause gadgets:}
+    \begin{itemize}
+        \item For each clause \( C_j = (l_{j1} \vee l_{j2} \vee l_{j3}) \) with literals \( l_{j1}, l_{j2}, l_{j3} \) (where each \( l_{ji} \) is either \( x_k \) or \( \neg x_k \) for some \( k \)), construct a \textit{gadget} to enforce that at least one of these literals is assigned the color of \( v_{\text{TRUE}} \).
+        \item For each clause, create a triangle of vertices \( v_{j1}, v_{j2}, v_{j3} \) corresponding to the literals \( l_{j1}, l_{j2}, l_{j3} \).
+        \item Add edges \( (v_{j1}, l_{j1}) \), \( (v_{j2}, l_{j2}) \), and \( (v_{j3}, l_{j3}) \). This enforces that each \( v_{ji} \) must take the color of the corresponding literal vertex \( l_{ji} \).
+        \item Finally, add edges between the vertices \( v_{j1}, v_{j2}, v_{j3} \) in a triangle. This ensures that at least one of these vertices must differ in color from the others, implying that at least one literal in the clause has the color of \( v_{\text{TRUE}} \), satisfying the clause.
+    \end{itemize}
+\end{enumerate}
+
+\newpage
+
+\subsection*{Correctness of the Reduction}
+
+We now show that \( G \) is 3-colorable if and only if \( \phi \) is satisfiable.
+
+\subsubsection*{(1) If \( \phi \) is satisfiable, then \( G \) is 3-colorable}
+
+\begin{itemize}
+    \item Suppose \( \phi \) is satisfiable. Then there exists a truth assignment to the variables \( x_1, x_2, \dots, x_n \) such that each clause in \( \phi \) has at least one true literal.
+    \item For each variable \( x_i \), color \( x_i \) red (the same as \( v_{\text{TRUE}} \)) if \( x_i \) is assigned \textbf{true} in the satisfying assignment, and color \( \neg x_i \) green (the same as \( v_{\text{FALSE}} \)). If \( x_i \) is assigned \textbf{false}, then color \( x_i \) green and \( \neg x_i \) red.
+    \item Since each clause has at least one true literal, at least one of the vertices \( v_{j1}, v_{j2}, v_{j3} \) in the clause gadget can be assigned the color red (matching \( v_{\text{TRUE}} \)). The triangle edges between \( v_{j1}, v_{j2}, v_{j3} \) ensure that not all of these vertices can have the same color, satisfying the gadget’s requirements.
+    \item Thus, we obtain a valid 3-coloring for \( G \).
+\end{itemize}
+
+\subsubsection*{(2) If \( G \) is 3-colorable, then \( \phi \) is satisfiable}
+
+\begin{itemize}
+    \item Suppose \( G \) has a valid 3-coloring. Assign \textbf{true} to a variable \( x_i \) if \( x_i \) is colored red (the same as \( v_{\text{TRUE}} \)), and assign \textbf{false} if \( x_i \) is colored green (the same as \( v_{\text{FALSE}} \)).
+    \item Since \( x_i \) and \( \neg x_i \) are connected by an edge and cannot have the same color, this assignment is well-defined and consistent for all variables.
+    \item For each clause gadget, the triangle constraint ensures that at least one of \( v_{j1}, v_{j2}, v_{j3} \) must be colored red, implying that at least one literal in each clause is assigned \textbf{true}.
+    \item Therefore, this truth assignment satisfies all clauses in \( \phi \).
+\end{itemize}
+
+\subsection*{Conclusion}
+
+Since \( G \) is 3-colorable if and only if \( \phi \) is satisfiable, we have successfully reduced 3-SAT to 3-Coloring. This reduction is polynomial in time because each step (creating vertices, adding edges, and constructing gadgets) involves a constant amount of work per variable and clause in \( \phi \). Thus, we conclude that the 3-Coloring Problem is NP-hard.
+
+\end{document}
